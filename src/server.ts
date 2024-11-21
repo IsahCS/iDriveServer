@@ -1,11 +1,11 @@
 import cors from "@fastify/cors";
 import Fastify from "fastify";
-import { routes } from "./routes";
+import { rideEstimate } from "./routes/rideEstimate";
 
 const app = Fastify({ logger: true });
 
 const start = async () => {
-    await app.register(routes);
+    await app.register(rideEstimate);
     try{
         await app.listen({ port: 8080 });
     } catch (err) {
