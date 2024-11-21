@@ -25,3 +25,17 @@ model Driver {
 
   @@map("drivers")
 }
+ 
+model Trip {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  customer_id String
+  origin      String
+  destination String
+  duration    String
+  distance    Float
+  driverId    String
+  value       Float
+  createdAt   DateTime @default(now())
+
+  @@map("trips")
+}
