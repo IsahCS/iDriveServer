@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv';
 import { getDrivers } from "../map/driver";
 
 interface EstimateRequest {
-    userId: string;
+    customer_id: string;
     origin: string;
     destination: string;
 }
@@ -18,9 +18,9 @@ const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY || '';
 
 export async function rideEstimate(app: FastifyInstance, options: FastifyPluginOptions) {
     app.post("/ride/estimate", async (request: FastifyRequest<{ Body: EstimateRequest }>, reply: FastifyReply) => {
-        const { userId, origin, destination } = request.body;
+        const { customer_id, origin, destination } = request.body;
 
-        if (!userId || !origin || !destination) {
+        if (!customer_id || !origin || !destination) {
             return reply.status(400).send({ error: "User ID, origin, and destination cannot be empty." });
         }
 
