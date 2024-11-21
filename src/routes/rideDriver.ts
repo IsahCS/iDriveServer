@@ -18,9 +18,6 @@ export async function rideDriver(app: FastifyInstance, options: FastifyPluginOpt
             const { customer_id } = request.params;
             const { driver_id } = request.query;
 
-            console.log("customer_id:", customer_id);
-            console.log("driver_id:", driver_id);
-
             if (!customer_id) {
                 return reply.status(400).send({
                     error_code: "INVALID_CUSTOMER",
@@ -44,17 +41,12 @@ export async function rideDriver(app: FastifyInstance, options: FastifyPluginOpt
                 selectedDriverId = selectedDriver.id;
             }
 
-            console.log("customer_id:", customer_id);
-            console.log("selectedDriverId:", selectedDriverId);
-
             const trips = await prisma.trip.findMany({
                 where: {
                     customer_id,
                     ...(selectedDriverId && { driverId: selectedDriverId }),
                 },
             });
-
-            console.log("trips:", trips);
 
             if (trips.length === 0) {
                 return reply.status(404).send({
