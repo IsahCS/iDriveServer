@@ -41,7 +41,7 @@ export async function rideEstimate(app: FastifyInstance, options: FastifyPluginO
                 const hours = Math.floor(durationInSeconds / 3600);
                 const minutes = Math.floor((durationInSeconds % 3600) / 60);
                 const distanceInMeters = routes.distanceMeters;
-                const distanceInKm = (distanceInMeters / 1000).toFixed(2);
+                const distanceInKm = parseFloat((distanceInMeters / 1000).toFixed(2));
                 let duration;
 
                 if (hours > 0 && minutes > 0) {
@@ -53,19 +53,21 @@ export async function rideEstimate(app: FastifyInstance, options: FastifyPluginO
                 }
 
                 const availableDrivers = await getAvailableDrivers(Number(distanceInKm));
-                const sortedDrivers = availableDrivers.sort((a, b) => parseFloat(a.totalFare) - parseFloat(b.totalFare));
+                const sortedDrivers = availableDrivers.sort((a, b) => parseFloat(a.value) - parseFloat(b.value));
 
                 return reply.send({
-                    routes: [
-                        {
-                            origin: routes.origin,
-                            destination: routes.destination,
-                        }
-                    ],
-                    distance: `${distanceInKm} km`,
+                    origin:{
+                        latitude: routes.origin.latLng.latitude,
+                        longitude: routes.origin.latLng.longitude
+                    },
+                    destination:{
+                        latitude: routes.destination.latLng.latitude,
+                        longitude: routes.destination.latLng.longitude
+                    },
+                    distance: distanceInKm,
                     duration,
-                    drivers: sortedDrivers,
-                    originalRouteResponse: routes.originalResponse,
+                    options: sortedDrivers,
+                    routeResponse: routes.originalResponse,
                 });
             }
         } catch (error) {
@@ -115,9 +117,12 @@ async function getAvailableDrivers(distanceInKm: number) {
             id: driver.id,
             name: driver.name,
             description: driver.description,
-            car: driver.car,
-            rating: driver.rating,
-            totalFare: (distanceInKm * driver.ratePerKm).toFixed(2),
+            vehicle: driver.car,
+            review: {
+                rating: driver.rating,
+                comment: driver.review,
+            },
+            value: (distanceInKm * driver.ratePerKm).toFixed(2),
         }));
 
     return availableDrivers;
