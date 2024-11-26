@@ -34,6 +34,7 @@ model Trip {
   duration    String
   distance    Float
   driverId    String
+  driverName  String
   value       Float
   createdAt   DateTime @default(now())
 
