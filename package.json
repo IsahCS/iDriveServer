@@ -16,11 +16,14 @@
     "@googlemaps/google-maps-services-js": "^3.4.0",
     "@prisma/client": "^5.22.0",
     "dotenv": "^16.4.5",
-    "fastify": "^4.28.1",
+    "fastify": "^5.1.0",
+    "fastify-diagnostics-channel": "^1.1.0",
+    "joi": "^17.13.3",
     "save-dev": "0.0.1-security",
     "tsx": "^4.19.2"
   },
   "devDependencies": {
+    "@types/fastify-cors": "^2.1.2",
     "@types/node": "^22.9.1",
     "prisma": "^5.22.0",
     "ts-node": "^10.9.2",
