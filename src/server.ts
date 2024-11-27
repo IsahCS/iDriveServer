@@ -30,7 +30,7 @@ const start = async () => {
         instance.register(rideDriver);
     });
     try{
-        await app.listen({ port: Number(PORT_8080) });
+        await app.listen({ port: Number(PORT_8080), host: '0.0.0.0' });
     } catch (err) {
         app.log.error(err);
         process.exit(1);
