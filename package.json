@@ -23,7 +23,6 @@
     "tsx": "^4.19.2"
   },
   "devDependencies": {
-    "@types/fastify-cors": "^2.1.2",
     "@types/node": "^22.9.1",
     "prisma": "^5.22.0",
     "ts-node": "^10.9.2",
