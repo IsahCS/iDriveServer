@@ -54,7 +54,10 @@ export async function calculateRouteDistance(body: EstimateRequest, reply: Fasti
                 });
             };
         } else {
-            return data;
+            return reply.status(404).send({
+                error_code: "ROUTE_NOT_FOUND",
+                message: "Rota não encontrada.",
+            });
         }
     } catch (error) {
         return reply.status(500).send({ 
