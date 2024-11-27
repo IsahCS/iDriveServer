@@ -2,7 +2,7 @@ import Joi from "joi";
 
 const schema = Joi.object({
     customer_id: Joi.string().required().messages({
-        "string.empty": "Id do Usuário não pode ser vazio.",
+        "string.empty": "Usuário não pode ser vazio.",
     })
 });
 

@@ -3,7 +3,7 @@ import Joi from "joi";
 
 const schema = Joi.object({
     customer_id: Joi.string().required().messages({
-        "string.empty": "Id do usuário não pode ser vazio.",
+        "string.empty": "Usuário não pode ser vazio.",
     }),
     origin: Joi.string().required().messages({
         "string.empty": "Origem não pode ser vazio.",
