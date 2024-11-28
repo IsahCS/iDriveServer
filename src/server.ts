@@ -9,9 +9,8 @@ import { validateSchemaRideDriver } from "./services/serviceValidateRideDriver";
 import cors from "@fastify/cors";
 
 dotenv.config();
-const PORT_8080 = process.env.PORT_8080 || 0;
+const PORT = process.env.PORT ? Number(process.env.PORT) : 8080;
 const app = Fastify({ logger: true });
-
 
 const start = async () => {
     app.register(cors, {
@@ -30,7 +29,7 @@ const start = async () => {
         instance.register(rideDriver);
     });
     try{
-        await app.listen({ port: Number(PORT_8080), host: '0.0.0.0' });
+        await app.listen({ port: Number(PORT), host: '0.0.0.0' });
     } catch (err) {
         app.log.error(err);
         process.exit(1);
