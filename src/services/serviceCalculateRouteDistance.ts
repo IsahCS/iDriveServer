@@ -8,7 +8,7 @@ interface RideRequest {
 }
 
 dotenv.config();
-const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY || '';
+const googleMapsApiKey = process.env.API_KEY || '';
 
 export async function calculateRouteDistance(body: EstimateRequest, reply: FastifyReply) {
     const { customer_id, origin, destination } = body;
