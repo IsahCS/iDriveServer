@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { calculateRouteDistance } from "../services/serviceCalculateRouteDistance";
-import { getRideHistory } from "../services/serviceRideHistory";
-import { rideConfirmation } from "../services/serviceRideConfirmation";
+import calculateRouteDistance from "../services/serviceCalculateRouteDistance";
+import getRideHistory from "../services/serviceRideHistory";
+import rideConfirmation from "../services/serviceRideConfirmation";
 
 const calculateRouteDistanceController = async (request: FastifyRequest<{ Body: EstimateRequest }>, reply: FastifyReply) => {
     return await calculateRouteDistance(request.body, reply);
