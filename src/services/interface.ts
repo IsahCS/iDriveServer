@@ -51,3 +51,14 @@ interface GetDriver {
     minKm: number;
     ratePerKm: number;
 }
+
+interface RideRequest {
+    origin: { address: string };
+    destination: { address: string };
+}
+
+interface EstimateRequest {
+    customer_id: string;
+    origin: string;
+    destination: string;
+}
