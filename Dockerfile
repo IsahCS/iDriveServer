@@ -1,9 +1,7 @@
 FROM node:18
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci
 COPY . .
-RUN npx prisma generate
-RUN ls -l /app/node_modules/.prisma/client
+RUN npm install
+RUN apt-get update && apt-get install -y postgresql-client
 EXPOSE 8080
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start", "dev"]
