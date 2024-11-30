@@ -1,24 +1,35 @@
-import { PrismaClient } from "@prisma/client";
+import pool from "../../db";
 
-const prisma = new PrismaClient();
+pool.connect()
+    .then(() => console.log('Conectado ao banco de dados' + process.env.DATABASE_URL))
+    .catch((err) => console.error('Erro ao conectar ao banco:', err));
 
-export async function getDrivers() {
+const getDrivers = async () => {
     try {
-        const drivers = await prisma.driver.findMany({
-            select: {
-                id: true,
-                name: true,
-                description: true,
-                car: true,
-                rating: true,
-                ratePerKm: true,
-                minKm: true,
-                review: true,
-            },
-        });
-        return drivers;
+        const result = await pool.query(`
+            SELECT id, name, description, car, rating, ratePerKm, minKm, review
+            FROM drivers
+        `);
+
+        return result.rows.map(mapDriver);
+
     } catch (error) {
         console.error("Erro ao buscar motoristas:", error);
-        throw new Error("Erro ao buscar motoristas." + error);
+        throw new Error("Erro ao buscar motoristas: " + error);
     }
 }
+
+const mapDriver = (driver: any) => {
+    return {
+        id: driver.id,
+        name: driver.name,
+        description: driver.description,
+        car: driver.car,
+        rating: driver.rating,
+        ratePerKm: driver.rateperkm,
+        minKm: driver.minkm,
+        review: driver.review
+    };
+}
+
+export default getDrivers;
