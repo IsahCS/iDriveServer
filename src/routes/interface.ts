@@ -17,7 +17,7 @@ interface RideConfirm {
     distance: number;
     duration: string;
     driver: {
-        id: string;
+        id: number;
         name: string;
     }
     value: number;
