@@ -1,63 +1,78 @@
 import { FastifyReply } from "fastify";
-import { getDrivers } from "./serviceGetDriver";
-import { PrismaClient } from "@prisma/client";
+import getDrivers from "./serviceGetDriver";
+import pool from "../../db";
 
-const prisma = new PrismaClient();
-
-export async function getRideHistory(customer_id: string, driver_id: string, reply: FastifyReply) {
+const getRideHistory = async (customer_id: string, driver_id: string, reply: FastifyReply) => {
     try {
-        let selectedDriverId: string | null = null;
+        const selectedDriverId = await getSelectedDriverId(driver_id, reply);
+        if (selectedDriverId === null && driver_id) return;
 
-        if (driver_id) {
-            const drivers = await getDrivers();
-            const selectedDriver = drivers.find((d) => d.id === driver_id);
-
-            if (!selectedDriver) {
-                return reply.status(400).send({
-                    error_code: "INVALID_DRIVER",
-                    error_description: "Motorista inválido."
-                });
+        const client = await pool.connect();
+        try {
+            const rides = await fetchRideHistory(client, customer_id, selectedDriverId);
+            if (rides.length > 0) {
+                return reply.status(200).send(formatRideHistory(customer_id, rides));
+            } else {
+                return sendError(reply, 404, "NO_RIDES_FOUND", "Nenhum registro encontrado.");
             }
-
-            selectedDriverId = selectedDriver.id;
-        }
-
-        const trips = await prisma.trip.findMany({
-            where: {
-                customer_id,
-                ...(selectedDriverId && { driverId: selectedDriverId }),
-            },
-        });
-
-        if (trips.length > 0) {
-            const rides = {
-                customer_id: trips[0].customer_id,
-                rides: trips.map((trip) => ({
-                    id: trip.id,
-                    date: trip.createdAt,
-                    origin: trip.origin,
-                    destination: trip.destination,
-                    distance: trip.distance,
-                    duration: trip.duration,
-                    driver: {
-                        id: trip.driverId,
-                        name: trip.driverName,
-                    },
-                    value: trip.value,
-                })),
-            };
-            return rides;
-        }
-        else {
-            return reply.status(404).send({
-                error_code: "NO_RIDES_FOUND",
-                error_description: "Nenhum registro encontrado."
-            });
+        } finally {
+            client.release();
         }
     } catch (error) {
-        return reply.status(500).send({
-            error_code: "INTERNAL_SERVER_ERROR",
-            error_description: "Erro interno no servidor."
-        });
+        console.error("Erro ao obter histórico de viagens:", error);
+        return sendError(reply, 500, "INTERNAL_SERVER_ERROR", "Erro interno no servidor.");
     }
 }
+
+const getSelectedDriverId = async (driver_id: string, reply: FastifyReply): Promise<number | null> => {
+    if (!driver_id) return null;
+
+    const drivers = await getDrivers();
+    const selectedDriver = drivers.find((d: Driver) => d.id === parseInt(driver_id));
+
+    if (!selectedDriver) {
+        sendError(reply, 400, "INVALID_DRIVER", "Motorista inválido.");
+        return null;
+    }
+
+    return selectedDriver.id;
+}
+
+const fetchRideHistory = async (client: any, customer_id: string, driver_id: number | null) => {
+    const query = `
+        SELECT * FROM trips
+        WHERE customer_id = $1
+        ${driver_id ? 'AND driverId = $2' : ''}
+    `;
+    const values = driver_id ? [customer_id, driver_id] : [customer_id];
+    const result = await client.query(query, values);
+    return result.rows;
+}
+
+const formatRideHistory = (customer_id: string, trips: Trip[]): RideHistory => {
+    return {
+        customer_id,
+        rides: trips.map((trip: Trip) => ({
+            id: trip.id,
+            date: trip.createdat,
+            origin: trip.origin,
+            destination: trip.destination,
+            distance: trip.distance,
+            duration: trip.duration,
+            driver: {
+                id: trip.driverid,
+                name: trip.drivername,
+            },
+            value: trip.value,
+        })),
+    };
+}
+
+const sendError = (reply: FastifyReply, statusCode: number, errorCode: string, errorDescription: string) => {
+    return reply.status(statusCode).send({
+        error_code: errorCode,
+        error_description: errorDescription
+    });
+}
+
+export default getRideHistory;
